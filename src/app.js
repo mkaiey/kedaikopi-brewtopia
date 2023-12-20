@@ -50,7 +50,7 @@ document.addEventListener("alpine:init", () => {
         // telusuri itemnya
         this.items = this.items.map((item) => {
           // jika bukan barang yang di klik
-          if(item.id !== id) {
+          if (item.id !== id) {
             return item;
           } else {
             item.quantity--;
@@ -69,6 +69,49 @@ document.addEventListener("alpine:init", () => {
     },
   });
 });
+
+// Form Validation
+const checkoutButton = document.querySelector(".checkout-button");
+checkoutButton.disabled = true;
+
+const form = document.querySelector("#checkoutForm");
+
+form.addEventListener("keyup", function () {
+  for (let i = 0; i < form.elements.length; i++) {
+    if (form.elements[i].value.length !== 0) {
+      checkoutButton.classList.remove("disabled");
+      checkoutButton.classList.add("disabled");
+    } else {
+      return false;
+    }
+  }
+  checkoutButton.disabled = false;
+  checkoutButton.classList.remove("disabled");
+});
+
+// kirim data ketika tombol checkout diklik
+checkoutButton.addEventListener("click", function (e) {
+  e.preventDefault();
+  const formData = new FormData(form);
+  const data = new URLSearchParams(formData);
+  const objData = Object.fromEntries(data);
+  const message = formatMessage(objData);
+  window.open('http://wa.me/6282180553668?text=' + encodeURIComponent(message));
+});
+
+// format pesan whatsapp
+const formatMessage = (obj) => {
+  return `Data Customer
+    Nama: ${obj.name}
+    Email: ${obj.email}
+    No HP: ${obj.phone}
+  Data Pesanan
+    ${JSON.parse(obj.items).map(
+      (item) => `${item.name} (${item.quantity} = ${rupiah(item.total)}) \n`
+    )}
+  TOTAL: ${rupiah(obj.total)}
+  Terima kasih.`;
+};
 
 // konversi ke Rupiah
 const rupiah = (number) => {
